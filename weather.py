@@ -24,22 +24,22 @@ else:
     url = f'http://api.openweathermap.org/data/2.5/weather?q={args.city_name},{args.country_code}&APPID={API_KEY}&units=metric'  # noqa: E501
 req = requests.get(url)
 
-dumps = json.loads(req.text)
+data = json.loads(req.text)
 
-desc = dumps['weather'][0]['description']
-temp = dumps['main']['temp']
-temp_min = dumps['main']['temp_min']
-temp_max = dumps['main']['temp_max']
-city = dumps['name'].lower()
-country = dumps['sys']['country'].lower()
-wind = dumps['wind']['speed']
+desc = data['weather'][0]['description']
+temp = data['main']['temp']
+temp_min = data['main']['temp_min']
+temp_max = data['main']['temp_max']
+city = data['name'].lower()
+country = data['sys']['country'].lower()
+wind = data['wind']['speed']
 
 _, sunrise = str(
-    datetime.datetime.fromtimestamp(int(dumps['sys']['sunrise']))
+    datetime.datetime.fromtimestamp(int(data['sys']['sunrise']))
 ).split(' ')
 
 _, sunset = str(
-    datetime.datetime.fromtimestamp(int(dumps['sys']['sunset']))
+    datetime.datetime.fromtimestamp(int(data['sys']['sunset']))
 ).split(' ')
 
 print(
