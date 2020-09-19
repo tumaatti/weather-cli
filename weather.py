@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+from api_key import API_KEY
+
 import argparse
+import datetime
 import json
 import requests
-from api_key import API_KEY
 
 parser = argparse.ArgumentParser(
     description='Get weather information for a city'
@@ -23,7 +25,26 @@ else:
 req = requests.get(url)
 
 dumps = json.loads(req.text)
+
+desc = dumps['weather'][0]['description']
+temp = dumps['main']['temp']
+temp_min = dumps['main']['temp_min']
+temp_max = dumps['main']['temp_max']
+city = dumps['name'].lower()
+country = dumps['sys']['country'].lower()
+
+_, sunrise = str(
+    datetime.datetime.fromtimestamp(int(dumps['sys']['sunrise']))
+).split(' ')
+
+_, sunset = str(
+    datetime.datetime.fromtimestamp(int(dumps['sys']['sunset']))
+).split(' ')
+
 print(
-    f"{dumps['weather'][0]['description']}, {dumps['main']['temp']} °C in "
-    f"{dumps['name']}, {dumps['sys']['country']}"
+    f"{city}, {country}\n\n"
+    f"{temp} °C ({temp_min} - {temp_max} °C)\n"
+    f"{desc}\n\n"
+    f"sunrise: {sunrise[:-3]}\n"
+    f"sunset:  {sunset[:-3]}\n"
 )
