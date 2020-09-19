@@ -32,6 +32,7 @@ temp_min = dumps['main']['temp_min']
 temp_max = dumps['main']['temp_max']
 city = dumps['name'].lower()
 country = dumps['sys']['country'].lower()
+wind = dumps['wind']['speed']
 
 _, sunrise = str(
     datetime.datetime.fromtimestamp(int(dumps['sys']['sunrise']))
@@ -42,9 +43,10 @@ _, sunset = str(
 ).split(' ')
 
 print(
-    f"{city}, {country}\n\n"
-    f"{temp} °C ({temp_min} - {temp_max} °C)\n"
-    f"{desc}\n\n"
-    f"sunrise: {sunrise[:-3]}\n"
-    f"sunset:  {sunset[:-3]}\n"
+    f" {city}, {country}\n\n"
+    f" {temp} °C ({temp_min} - {temp_max} °C)\n"
+    f" {wind} m/s\n"
+    f" {desc}\n\n"
+    f" sunrise: {sunrise[:-3]}\n"
+    f" sunset:  {sunset[:-3]}\n"
 )
