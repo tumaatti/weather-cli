@@ -8,6 +8,7 @@ import datetime
 import json
 import requests
 
+
 parser = argparse.ArgumentParser(
     description='Get weather information for a city'
 )
@@ -22,14 +23,18 @@ if not args.country_code:
     url = f'http://api.openweathermap.org/data/2.5/weather?q={args.city_name}&APPID={API_KEY}&units=metric'  # noqa: E501
 else:
     url = f'http://api.openweathermap.org/data/2.5/weather?q={args.city_name},{args.country_code}&APPID={API_KEY}&units=metric'  # noqa: E501
-req = requests.get(url)
 
+req = requests.get(url)
+if req.status_code != 200:
+    print(
+        "API didn't return anything. Did you type the city name correctly?"
+    )
 dumps = json.loads(req.text)
 
+lon = dumps['coord']['lon']
+lat = dumps['coord']['lat']
 desc = dumps['weather'][0]['description']
 temp = dumps['main']['temp']
-temp_min = dumps['main']['temp_min']
-temp_max = dumps['main']['temp_max']
 city = dumps['name'].lower()
 country = dumps['sys']['country'].lower()
 wind = dumps['wind']['speed']
@@ -43,10 +48,45 @@ _, sunset = str(
 ).split(' ')
 
 print(
-    f" {city}, {country}\n\n"
-    f" {temp} °C ({temp_min} - {temp_max} °C)\n"
-    f" {wind} m/s\n"
-    f" {desc}\n\n"
+    f"weather in {city}, {country}\n"
+    f"  {temp} °C \n"
+    f"  {wind} m/s\n"
+    f"  {desc}\n\n"
+    f"  sunrise: {sunrise[:-3]}\n"
+    f"  sunset:  {sunset[:-3]}\n"
+)
+
+one_call_url = f'https://api.openweathermap.org/data/2.5/onecall?lat={lat}&lon={lon}&exclude=current,minutely,hourly&appid={API_KEY}&units=metric'  # noqa: E501
+req = requests.get(one_call_url)
+if req.status_code != 200:
+    print(
+        "API didn't return anything. Did you type the city name correctly?"
+    )
+dumps = json.loads(req.text)
+
+# in daily forecast the 0th day is today
+tomorrow_json = dumps['daily'][0]
+temp_morn = tomorrow_json['temp']['morn']
+temp_day = tomorrow_json['temp']['day']
+temp_eve = tomorrow_json['temp']['eve']
+temp_night = tomorrow_json['temp']['night']
+weather_desc = tomorrow_json['weather'][0]['description']
+wind_speed = tomorrow_json['wind_speed']
+day, sunrise = str(
+    datetime.datetime.fromtimestamp(int(tomorrow_json['sunrise']))
+).split()
+_, sunset = str(
+    datetime.datetime.fromtimestamp(int(tomorrow_json['sunset']))
+).split()
+
+print(
+    f"weather for tomorrow:\n"
+    f"  morning:  {temp_morn} °C\n"
+    f"  day:      {temp_day} °C\n"
+    f"  evening:  {temp_eve} °C\n"
+    f"  night:    {temp_night} °C\n\n"
+    f" {wind_speed} m/s\n"
+    f" {weather_desc}\n\n"
     f" sunrise: {sunrise[:-3]}\n"
     f" sunset:  {sunset[:-3]}\n"
 )
