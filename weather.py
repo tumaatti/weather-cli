@@ -6,7 +6,7 @@ from api_key import API_KEY
 import argparse
 import datetime
 import json
-import requests
+import httpx
 
 
 def main():
@@ -25,7 +25,7 @@ def main():
     else:
         url = f'http://api.openweathermap.org/data/2.5/weather?q={args.city_name},{args.country_code}&APPID={API_KEY}&units=metric'  # noqa: E501
 
-    req = requests.get(url)
+    req = httpx.get(url)
     if req.status_code != 200:
         print(
             "API didn't return anything. Did you type the city name correctly?"
@@ -58,8 +58,8 @@ def main():
         f"  sunset:  {sunset[:-3]}\n"
     )
 
-    one_call_url = f'https://api.openweathermap.org/data/2.5/onecall?lat={lat}&lon={lon}&exclude=current,minutely,hourly&appid={API_KEY}&units=metric'  # noqa: E501
-    req = requests.get(one_call_url)
+    one_call_url = f'https://api.openweathermap.org/data/2.5/onecall?lat={lat}&lon={lon}&exclude=minutely,hourly&appid={API_KEY}&units=metric'  # noqa: E501
+    req = httpx.get(one_call_url)
     if req.status_code != 200:
         print(
             "API didn't return anything. Did you type the city name correctly?"
